@@ -34,8 +34,6 @@ ReadMode('cbreak');
 while (1) {
     my $input = ReadKey(0);
     if ( $input eq " " ) {
-
-        # print "\t\t\t\t-----------------------------------\n\t\t\t\t";
         print $xlsx_reader->getAnswer($count), "\n";
     }
     elsif ( $input eq "a" ) {
