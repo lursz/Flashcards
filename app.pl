@@ -10,42 +10,50 @@ use Term::ReadKey;
 use lib 'lib';
 use ReadXLSX;
 
-
-
 # ---------------------------- Read from terminal ---------------------------- #
 if ( $#ARGV + 1 != 3 ) {
-    die "Error: 3 arguments required.\nUsage: app.pl <file_name> <beginning_line> <ending_line>";
+    die
+"Error: 3 arguments required.\nUsage: app.pl <file_name> <beginning_line> <ending_line>";
 }
 my $file_name = $ARGV[0];
 my $beg_line  = $ARGV[1];
 my $end_line  = $ARGV[2];
 
 # ------------------------------ Read from XLSX ------------------------------ #
-my $xlsx_reder = ReadXLSX->new($file_name, $beg_line, $end_line);
-
-$xlsx_reder->loadQuestions();
-$xlsx_reder->loadAnswers();
-$xlsx_reder->shuffle();
-
-
+my $xlsx_reader = ReadXLSX->new( $file_name, $beg_line, $end_line );
+$xlsx_reader->init();
+$xlsx_reader->loadQuestions();
+$xlsx_reader->loadAnswers();
+$xlsx_reader->shuffle();
 
 # -------------------------------- FlashCards -------------------------------- #
-my $count = 0;
+my $count  = 0;
 my $length = $end_line - $beg_line;
+
 ReadMode('cbreak');
 while (1) {
-    say "[$count/$length]   ", $xlsx_reder->getQuestion($count);
     my $input = ReadKey(0);
     if ( $input eq " " ) {
-        print "\t\t\t\t\t\t\t---------------\n\t\t\t\t";
-        print $xlsx_reder->getAnswer($count), "\n";
-        $count++;
+
+        # print "\t\t\t\t-----------------------------------\n\t\t\t\t";
+        print $xlsx_reader->getAnswer($count), "\n";
     }
-    elsif ( $input eq "a" ) {    # Up or right arrow key
+    elsif ( $input eq "a" ) {
         $count--;
+        if ( $count < 0 ) {
+            $count = 0;
+        }
+        $xlsx_reader->clearScreen();
+        say "[$count/$length]   ", $xlsx_reader->getQuestion($count);
     }
-    elsif ( $input eq "d" ) {    # Down or left arrow key
+    elsif ( $input eq "d" ) {
         $count++;
+        if ( $count > $length ) {
+            $count = $length;
+        }
+        $xlsx_reader->clearScreen();
+        say "[$count/$length]   ", $xlsx_reader->getQuestion($count);
+
     }
 }
 ReadMode('normal');

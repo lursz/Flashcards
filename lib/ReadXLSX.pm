@@ -10,7 +10,8 @@ use Spreadsheet::Read qw(ReadData);
 # ---------------------------------------------------------------------------- #
 #                                Class ReadXLSX                                #
 # ---------------------------------------------------------------------------- #
-my $book_data = ReadData('lib/ex.xlsx');
+# my $book_data = ReadData('lib/ex.xlsx');
+my $book_data;
 my @answers;
 my @questions;
 
@@ -27,6 +28,10 @@ sub new {
     return $self;
 }
 
+sub init{
+    my $self = shift;
+    $book_data = ReadData($self->{filename});
+}
 sub loadQuestions{
     my $self = shift;
     for my $i ( $self->{begin_line} .. $self->{ending_line} ) {
@@ -98,6 +103,11 @@ sub getAuestions{
     return @questions;
 }
 
+sub clearScreen {
+    my ($self) = @_;
+    print "\033[2J";
+    print "\033[0;0H";
+}
 
 
 1;
