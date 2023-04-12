@@ -8,7 +8,7 @@ use v5.34.0;
 use Term::ReadKey;
 
 use lib 'lib';
-use ReadXLSX;
+use ReadXLSXandCSV;
 
 # ---------------------------- Read from terminal ---------------------------- #
 if ( $#ARGV + 1 != 3 ) {
@@ -20,12 +20,11 @@ my $beg_line  = $ARGV[1];
 my $end_line  = $ARGV[2];
 
 # ------------------------------ Read from XLSX ------------------------------ #
-my $xlsx_reader = ReadXLSX->new( $file_name, $beg_line, $end_line );
-$xlsx_reader->init();
-$xlsx_reader->loadQuestions();
-$xlsx_reader->loadAnswers();
-$xlsx_reader->shuffle();
-
+my $xlsx_reader = ReadXLSXandCSV->new(
+    filename   => $file_name,
+    begin_line => $beg_line,
+    ending_line => $end_line
+);
 # -------------------------------- FlashCards -------------------------------- #
 my $count  = 0;
 my $length = $end_line - $beg_line;
