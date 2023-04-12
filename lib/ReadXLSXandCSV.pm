@@ -7,11 +7,12 @@ use diagnostics;
 use feature 'say';
 use feature "switch";
 
+use Text::CSV;
 use List::Util 'shuffle';
 use Spreadsheet::Read qw(ReadData);
 
 # ---------------------------------------------------------------------------- #
-#                                Class ReadXLSX                                #
+#                             Class ReadXLSXandCSV                             #
 # ---------------------------------------------------------------------------- #
 has 'book_data' => (is => 'rw', isa => 'ArrayRef', default => sub { [] } );
 has 'filename' => (is => 'ro', isa => 'Str', required => 1);
@@ -22,22 +23,46 @@ has 'array' => ( is => 'rw', isa => 'ArrayRef', default => sub { [] } );
 sub BUILD {
     my $self = shift;
     $self->init();
-    $self->load();
-    $self->shuffleArray();
+ 
+
 }
 
 sub init {
     my $self = shift;
     say "Reading file...";
-    $self->{book_data} = ReadData( $self->{filename} );
+    if ($self->{filename} =~ m/\.xlsx$/) {
+        $self->readXLSX();
+    }
+    elsif ($self->{filename} =~ m/\.csv$/) {
+        $self->readCSV();
+    }
+    else {
+        die "Error: File format not supported";
+    }
+    $self->shuffleArray();
     say "Done. Use [a][space][d] to navigate";
 }
 
-sub load {
+
+
+
+sub readXLSX {
     my $self = shift;
+    $self->{book_data} = ReadData( $self->{filename} );
     for my $i ( $self->{begin_line} .. $self->{ending_line} ) {
         my @row = Spreadsheet::Read::row( $self->{book_data}[1], $i );
         push @{ $self->{array} }, [$row[0], $row[1]];
+    }
+}
+
+sub readCSV {
+    my $self = shift;
+    my $csv = Text::CSV->new({binary => 1, auto_diag => 1});
+    open(my $fh, "<", $self->{filename}) or die "Cannot open the file";
+
+    for my $i ( $self->{begin_line} .. $self->{ending_line} ) {
+        my $row = $csv->getline($fh);
+        push @{ $self->{array} }, [$row->[0], $row->[1]];
     }
 }
 

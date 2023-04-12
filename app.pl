@@ -20,7 +20,7 @@ my $beg_line  = $ARGV[1];
 my $end_line  = $ARGV[2];
 
 # ------------------------------ Read from XLSX ------------------------------ #
-my $xlsx_reader = ReadXLSXandCSV->new(
+my $reader = ReadXLSXandCSV->new(
     filename   => $file_name,
     begin_line => $beg_line,
     ending_line => $end_line
@@ -33,23 +33,23 @@ ReadMode('cbreak');
 while (1) {
     my $input = ReadKey(0);
     if ( $input eq " " ) {
-        print $xlsx_reader->getAnswer($count), "\n";
+        print $reader->getAnswer($count), "\n";
     }
     elsif ( $input eq "a" ) {
         $count--;
         if ( $count < 0 ) {
             $count = 0;
         }
-        $xlsx_reader->clearScreen();
-        say "[$count/$length]   ", $xlsx_reader->getQuestion($count);
+        $reader->clearScreen();
+        say "[$count/$length]   ", $reader->getQuestion($count);
     }
     elsif ( $input eq "d" ) {
         $count++;
         if ( $count > $length ) {
             $count = $length;
         }
-        $xlsx_reader->clearScreen();
-        say "[$count/$length]   ", $xlsx_reader->getQuestion($count);
+        $reader->clearScreen();
+        say "[$count/$length]   ", $reader->getQuestion($count);
 
     }
 }
